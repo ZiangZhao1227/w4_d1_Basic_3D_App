@@ -35,28 +35,28 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        btn_add_tree.setOnClickListener {
+        btn_add.setOnClickListener {
             add3dObject()
         }
 
         arFrag = supportFragmentManager.findFragmentById(
             R.id.sceneform_fragment
         ) as ArFragment
-         StrictMode.setThreadPolicy(
-             StrictMode.ThreadPolicy.Builder()
-            .permitAll().build())
-         // (CC BY 4.0) Donated by Cesium for glTF testing.
-         ModelRenderable.builder()
-         .setSource(this, Uri.parse("https://github.com/KhronosGroup/glTF-Sample-Models/raw/master/2.0/CesiumMan/glTF/CesiumMan.gltf"))
-             .setIsFilamentGltf(true)
-             .setAsyncLoadEnabled(true)
-             .setRegistryId("CesiumMan")
-             .build()
-             .thenAccept { modelRenderable = it }
-             .exceptionally {
-                 Log.e(TAG, "something went wrong ${it.localizedMessage}")
-                 null
-             }
+        StrictMode.setThreadPolicy(
+            StrictMode.ThreadPolicy.Builder()
+                .permitAll().build())
+        // (CC BY 4.0) Donated by Cesium for glTF testing.
+        ModelRenderable.builder()
+            .setSource(this, Uri.parse("https://github.com/KhronosGroup/glTF-Sample-Models/raw/master/2.0/CesiumMan/glTF/CesiumMan.gltf"))
+            .setIsFilamentGltf(true)
+            .setAsyncLoadEnabled(true)
+            .setRegistryId("CesiumMan")
+            .build()
+            .thenAccept { modelRenderable = it }
+            .exceptionally {
+                Log.e(TAG, "something went wrong ${it.localizedMessage}")
+                null
+            }
 
         arFrag.setOnTapArPlaneListener { hitResult: HitResult?, _, _ ->
             viewRenderable ?: return@setOnTapArPlaneListener
@@ -74,15 +74,14 @@ class MainActivity : AppCompatActivity() {
             // Sets this as the selected node in the TransformationSystem
             viewNode.select()
 
-            viewNode.setOnTapListener { hitTestResult, motionEvent ->
-                Log.e("txt","clicked")
-            }
         }
+
     }
 
     private fun add3dObject() {
         val frame = arFrag.arSceneView.arFrame
         if (frame != null && modelRenderable != null) {
+            btn_add.visibility = View.GONE
             val pt = getScreenCenter()
             val hits = frame.hitTest(pt.x.toFloat(), pt.y.toFloat())
             for (hit in hits) {
@@ -93,8 +92,11 @@ class MainActivity : AppCompatActivity() {
                     anchorNode.setParent(arFrag.arSceneView.scene)
                     val mNode =
                         TransformableNode(arFrag.transformationSystem)
+                    mNode.setOnTapListener { hitTestResult, motionEvent ->
+                        btn_add.visibility = View.VISIBLE
+                    }
                     mNode.renderable = modelRenderable
-                    mNode.scaleController.minScale = 0.05f
+                    mNode.scaleController.minScale = 0.4f
                     mNode.scaleController.maxScale = 2.0f
                     mNode.localScale = Vector3(0.2f, 0.2f, 0.2f)
                     mNode.setParent(anchorNode)
