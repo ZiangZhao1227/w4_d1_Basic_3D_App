@@ -3,9 +3,7 @@ package com.example.w4_d1_basic_3d_app
 import android.content.ContentValues.TAG
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import com.google.ar.core.HitResult
 import com.google.ar.sceneform.AnchorNode
-import com.google.ar.sceneform.rendering.ViewRenderable
 import com.google.ar.sceneform.ux.ArFragment
 import com.google.ar.sceneform.ux.TransformableNode
 import android.graphics.Point
@@ -21,7 +19,6 @@ import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
     private lateinit var arFrag: ArFragment
-    private var viewRenderable: ViewRenderable? = null
     private var modelRenderable: ModelRenderable? = null
 
     private fun getScreenCenter(): Point {
@@ -57,25 +54,6 @@ class MainActivity : AppCompatActivity() {
                 Log.e(TAG, "something went wrong ${it.localizedMessage}")
                 null
             }
-
-        arFrag.setOnTapArPlaneListener { hitResult: HitResult?, _, _ ->
-            viewRenderable ?: return@setOnTapArPlaneListener
-            //Creates a new anchor at the hit location
-            val anchor = hitResult!!.createAnchor()
-            //Creates a new anchorNode attaching it to anchor
-            val anchorNode = AnchorNode(anchor)
-            // Add anchorNode as root scene node's child
-            anchorNode.setParent(arFrag.arSceneView.scene)
-            // Can be selected, rotated...
-            val viewNode = TransformableNode(arFrag.transformationSystem)
-            viewNode.renderable = viewRenderable
-            // Add viewNode as anchorNode's child
-            viewNode.setParent(anchorNode)
-            // Sets this as the selected node in the TransformationSystem
-            viewNode.select()
-
-        }
-
     }
 
     private fun add3dObject() {
